@@ -1,6 +1,5 @@
 from config import db
 
-
 # Database model represented as a python class
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -8,7 +7,6 @@ class Contact(db.Model):
     first_name = db.Column(db.String(80), unique=False, nullable=False)
     last_name = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
-
 
     # convert object to python dictionary to convert into json
     def to_json(self):
@@ -18,6 +16,3 @@ class Contact(db.Model):
             "lastName": self.last_name,
             "email": self.email,
         }
-
-
-    
