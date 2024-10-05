@@ -20,7 +20,7 @@ def create_contact():
 
     # return 400 if missing a field
     if not first_name or not last_name or not email:
-        return(jsonify({"message": "Bad request"}), 400,)
+        return jsonify({"message": "Failed to create user. A first name, last name and email are required."}), 400
 
     # Create a new contact
     new_contact = Contact(
@@ -29,8 +29,8 @@ def create_contact():
         email=email
     )
     try:
-        db.session.add(new_contact) # Add to DB session
-        db.session.commit()         # Write anything in the session to DB
+        db.session.add(new_contact)  # Add to DB session
+        db.session.commit()          # Write anything in the session to DB
     except Exception as e:
         return jsonify({"message": str(e)}), 400
     return jsonify({"message": "New user successfully created"}), 201
@@ -38,7 +38,7 @@ def create_contact():
 # Update a contact with user_id
 @app.route("/update_contact/<int:user_id>", methods=["PATCH"])
 def update_contact(user_id):
-    contact = Contact.query.get(user_id) # Find the user with the user_id
+    contact = Contact.query.get(user_id)  # Find the user with the user_id
 
     # Check if the user exists
     if not contact:
@@ -51,12 +51,12 @@ def update_contact(user_id):
     contact.email = data.get("email", contact.email)
 
     db.session.commit()
-    return jsonify({"message", "User updated successfully."}), 200
+    return jsonify({"message": "User updated successfully."}), 200
 
 # Deleting a contact with user_id
 @app.route("/delete_contact/<int:user_id>", methods=["DELETE"])
 def delete_contact(user_id):
-    contact = Contact.query.get(user_id) # Find the user with the user_id
+    contact = Contact.query.get(user_id)  # Find the user with the user_id
 
     # Check if the user exists
     if not contact:
