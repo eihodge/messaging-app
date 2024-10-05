@@ -1,9 +1,8 @@
 import { useState } from "react"
 const UserForm = ({ existingUser = {}, updateCallback }) => {
     // State for the user variables
-    const [firstName, setFirstName] = useState(existingUser.firstName || "");
-    const [lastName, setLastName] = useState(existingUser.lastName || "");
-    const [email, setEmail] = useState(existingUser.email || "");
+    const [username, setUsername] = useState(existingUser.username || "");
+    const [password, setPassword] = useState(existingUser.password || "");
 
     // If you pass an object with at least on entry inside of it, then its being updated not created
     const updating = Object.entries(existingUser).length !== 0;
@@ -14,9 +13,8 @@ const UserForm = ({ existingUser = {}, updateCallback }) => {
 
         // Define the data
         const data = {
-            firstName,
-            lastName,
-            email
+            username,
+            password,
         }
 
         // Define the URL for the API request
@@ -55,35 +53,26 @@ const UserForm = ({ existingUser = {}, updateCallback }) => {
 
     return <form onSubmit={onSubmit}>
         <div>
-            <label htmlFor="firstName">First Name:</label>
+            <label htmlFor="username">Username:</label>
             <input 
                 type="text" 
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)} 
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)} 
             />
         </div>
 
 
         <div>
-            <label htmlFor="lastName">Last Name:</label>
+            <label htmlFor="password">Last Name:</label>
             <input 
                 type="text" 
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)} 
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)} 
             />
         </div>
 
-        <div>
-            <label htmlFor="email">Email:</label>
-            <input 
-                type="text" 
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)} 
-            />
-        </div>
 
         <button type="submit">{updating ? "Save" : "Create"} User</button>
     </form>

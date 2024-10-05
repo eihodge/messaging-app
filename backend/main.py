@@ -14,19 +14,17 @@ def get_users():
 # Create a user
 @app.route("/create_user", methods=["POST"])
 def create_user():
-    first_name = request.json.get("firstName")
-    last_name = request.json.get("lastName")
-    email = request.json.get("email")
+    username = request.json.get("username")
+    password = request.json.get("password")
 
     # return 400 if missing a field
-    if not first_name or not last_name or not email:
-        return jsonify({"message": "Failed to create user. A first name, last name and email are required."}), 400
+    if not username or not password:
+        return jsonify({"message": "Failed to create user. A unique username and a password are required."}), 400
 
     # Create a new user
     new_user = User(
-        first_name=first_name, 
-        last_name=last_name, 
-        email=email
+        username=username, 
+        password=password
     )
     try:
         db.session.add(new_user)  # Add to DB session
@@ -45,9 +43,9 @@ def update_user(user_id):
         return jsonify({"message": "User not found"}), 404
     
     data = request.json
-    # If there is no firstName in data, keep the preexisting value for user.first_name
-    user.first_name = data.get("firstName", user.first_name)
-    user.last_name = data.get("lastName", user.last_name)
+    # If there is no username in data, keep the preexisting value for user.username
+    user.username = data.get("username", user.username)
+    user.password = data.get("password", user.password)
     user.email = data.get("email", user.email)
 
     db.session.commit()

@@ -4,15 +4,13 @@ from config import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Max length of 80, cannot be null
-    first_name = db.Column(db.String(80), unique=False, nullable=False)
-    last_name = db.Column(db.String(80), unique=False, nullable=False)
-    email = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=False, nullable=False)
+    password = db.Column(db.String(80), unique=False, nullable=False)
 
     # convert object to python dictionary to convert into json
     def to_json(self):
         return {
             "id": self.id,
-            "firstName": self.first_name,
-            "lastName": self.last_name,
-            "email": self.email,
+            "username": self.username,
+            "password": self.password,
         }

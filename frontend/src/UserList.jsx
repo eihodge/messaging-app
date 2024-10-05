@@ -24,9 +24,8 @@ const UserList = ({ users, updateUser, updateCallback }) => {
         <table>
             <thead>
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
+                    <th>username</th>
+                    <th>password</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -34,9 +33,8 @@ const UserList = ({ users, updateUser, updateCallback }) => {
             <tbody>
                 {users.map((user) => (
                     <tr key={user.id}>
-                        <td>{user.firstName}</td>
-                        <td>{user.lastName}</td>
-                        <td>{user.email}</td>
+                        <td>{user.username}</td>
+                        <td>{user.password}</td>
                         <td>
                             <button onClick = {() => updateUser(user)}>Edit</button>
                             <button onClick = {() => onDelete(user.id)}>Delete</button>
