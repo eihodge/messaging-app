@@ -1,12 +1,12 @@
 import { useState } from "react"
-const ContactForm = ({ existingContact = {}, updateCallback }) => {
-    // State for the contact variables
-    const [firstName, setFirstName] = useState(existingContact.firstName || "");
-    const [lastName, setLastName] = useState(existingContact.lastName || "");
-    const [email, setEmail] = useState(existingContact.email || "");
+const UserForm = ({ existingUser = {}, updateCallback }) => {
+    // State for the user variables
+    const [firstName, setFirstName] = useState(existingUser.firstName || "");
+    const [lastName, setLastName] = useState(existingUser.lastName || "");
+    const [email, setEmail] = useState(existingUser.email || "");
 
     // If you pass an object with at least on entry inside of it, then its being updated not created
-    const updating = Object.entries(existingContact).length !== 0;
+    const updating = Object.entries(existingUser).length !== 0;
 
     const onSubmit = async (e) =>  {
         // Prevent page from refreshing automatically
@@ -22,9 +22,9 @@ const ContactForm = ({ existingContact = {}, updateCallback }) => {
         // Define the URL for the API request
         let url = ""
         if (updating) {
-            url = "http://127.0.0.1:5000/" + `update_contact/${existingContact.id}`
+            url = "http://127.0.0.1:5000/" + `update_user/${existingUser.id}`
         } else {
-            url = "http://127.0.0.1:5000/create_contact"
+            url = "http://127.0.0.1:5000/create_user"
         }
         
         // Set request options
@@ -85,8 +85,8 @@ const ContactForm = ({ existingContact = {}, updateCallback }) => {
             />
         </div>
 
-        <button type="submit">{updating ? "Save" : "Create"} Contact</button>
+        <button type="submit">{updating ? "Save" : "Create"} User</button>
     </form>
 }
 
-export default ContactForm
+export default UserForm

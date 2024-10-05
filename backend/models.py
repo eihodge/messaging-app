@@ -1,7 +1,7 @@
 from config import db
 
 # Database model represented as a python class
-class Contact(db.Model):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Max length of 80, cannot be null
     first_name = db.Column(db.String(80), unique=False, nullable=False)

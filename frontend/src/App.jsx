@@ -1,27 +1,27 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import ContactList from './ContactList.jsx'
-import ContactForm from './ContactForm.jsx'
+import UserList from './UserList.jsx'
+import UserForm from './UserForm.jsx'
 
 function App() {
-  const [contacts, setContacts] = useState([]);
+  const [users, setUsers] = useState([]);
 
   // Modal (pop-up) window
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Store the contact as its being edited
-  const [currentContact, setCurrentContact] = useState({})
+  // Store the user as its being edited
+  const [currentUser, setCurrentUser] = useState({})
 
   useEffect(() => {
-    fetchContacts();
+    fetchUsers();
   }, []); // Call only when it mounts
 
   // async because it waits a second to fetch the content
-  const fetchContacts = async () => {
+  const fetchUsers = async () => {
     // Send API request to backend
-    const response = await fetch("http://127.0.0.1:5000/contacts");
-    const data = await response.json();  // {"contacts": []}
-    setContacts(data.contacts);
+    const response = await fetch("http://127.0.0.1:5000/users");
+    const data = await response.json();  // {"users": []}
+    setUsers(data.users);
   }
 
   // Closes the modal
@@ -29,35 +29,35 @@ function App() {
     setIsModalOpen(false);
   }
 
-  // Open the modal to create or edit new contact
+  // Open the modal to create or edit new user
   const openModal = () => {
     setIsModalOpen(true);
   }
 
-  const openEditModal = (contact) => {
+  const openEditModal = (user) => {
     // Check if the modal is open
     if (isModalOpen) {
       return
     }
-    setCurrentContact(contact)
+    setCurrentUser(user)
     setIsModalOpen(true)
   }
 
   const onUpdate = () => {
     closeModal()
-    fetchContacts()
+    fetchUsers()
   }
   
   return (
     <>
-      <ContactList contacts={contacts} updateContact={openEditModal} updateCallback={onUpdate} />
-      <button onClick={openModal}>Create New Contact</button>
+      <UserList users={users} updateUser={openEditModal} updateCallback={onUpdate} />
+      <button onClick={openModal}>Create New User</button>
       {
         isModalOpen && 
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={closeModal}>&times;</span>
-            <ContactForm existingContact={currentContact} updateCallback={onUpdate} />
+            <UserForm existingUser={currentUser} updateCallback={onUpdate} />
           </div>
         </div>
       }

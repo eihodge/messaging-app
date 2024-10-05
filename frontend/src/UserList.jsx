@@ -1,21 +1,21 @@
 import React from "react"
 
-// Take contacts as a prompt
-const ContactList = ({ contacts, updateContact, updateCallback }) => {
+// Take users as a prompt
+const UserList = ({ users, updateUser, updateCallback }) => {
     const onDelete = async (id) => {
         try {
             const options = {
                 method: "DELETE"
             }
-            const response = await fetch(`http://127.0.0.1:5000/delete_contact/${id}`, options);
+            const response = await fetch(`http://127.0.0.1:5000/delete_user/${id}`, options);
             if (response.status === 200) {
                 updateCallback()
             } else {
-                console.error(`Failed to delete contact with ID: ${id}`);
+                console.error(`Failed to delete user with ID: ${id}`);
             }
         
         } catch (error) {
-            console.error("Error deleting contact:", error);
+            console.error("Error deleting user:", error);
         }
     }
 
@@ -32,14 +32,14 @@ const ContactList = ({ contacts, updateContact, updateCallback }) => {
             </thead>
             
             <tbody>
-                {contacts.map((contact) => (
-                    <tr key={contact.id}>
-                        <td>{contact.firstName}</td>
-                        <td>{contact.lastName}</td>
-                        <td>{contact.email}</td>
+                {users.map((user) => (
+                    <tr key={user.id}>
+                        <td>{user.firstName}</td>
+                        <td>{user.lastName}</td>
+                        <td>{user.email}</td>
                         <td>
-                            <button onClick = {() => updateContact(contact)}>Edit</button>
-                            <button onClick = {() => onDelete(contact.id)}>Delete</button>
+                            <button onClick = {() => updateUser(user)}>Edit</button>
+                            <button onClick = {() => onDelete(user.id)}>Delete</button>
                             <button>Send Message</button>
                         </td>
                     </tr>
@@ -49,4 +49,4 @@ const ContactList = ({ contacts, updateContact, updateCallback }) => {
     </div>
 }
 
-export default ContactList
+export default UserList
