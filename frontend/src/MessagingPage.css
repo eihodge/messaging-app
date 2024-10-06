@@ -1,0 +1,111 @@
+html, body {
+    background-color: white;
+}
+
+.messagesApp {
+    /* background-color: orange; */
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.headerText {
+    font-size: 50px;
+    text-align: left;
+    margin-top: 0px;
+    margin-left: 20px;
+}
+  
+.userMessage, .receiverMessage {
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin: 4px;
+    max-width: 40%;
+}
+
+.userMessage {
+    align-self: flex-end;
+    background: linear-gradient(to right, #6587fb, #41c2e6);
+    color: white;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    border-bottom-left-radius: 32px;
+    border-bottom-right-radius: 3px;
+}
+  
+.receiverMessage {
+    align-self: flex-start;
+    background: linear-gradient(to right, #e8e9ed, #ecebf1);
+    color: black;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 32px;
+}
+  
+.messagesBox {
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    height: 60vh;
+    margin: 20px 0; 
+    text-align: left;
+    font-size: 16px;
+    
+
+    /* background-color: red; */
+}
+
+.smallText {font-size: 12px;}
+
+.messagesAndTextareaBox {
+    /* background-color: blue; */
+    max-height: 70vh;
+}
+
+.messagesHeader {
+    max-height: 30vh;
+    /* background-color: green; */
+}
+
+
+
+textarea#messageContent {
+    width: 80%;
+    height: 50px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #ebecef;
+    border: none;
+    resize: none;
+    font-size: 16px;
+}
+
+.sendButton {
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    width: 60px;
+    height: 60px;
+}
+.sendButton:hover {
+    background-color: #ebecef;
+    cursor: pointer;
+}
+
+.messageInputContainer {
+    display: flex;
+    background-color: rgba(255, 0, 0, 0);
+    justify-content: center;
+    align-items: center;
+    margin-top: -20px;
+}

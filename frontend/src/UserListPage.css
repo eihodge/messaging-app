@@ -1,0 +1,50 @@
+.user-table-container {
+    margin: 20px auto;
+    width: 50%;
+}
+  
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+  
+.user-table th, .user-table td {
+    border: none;
+    padding: 12px;
+    padding-left: 30px;
+    text-align: left;
+}
+ 
+.user-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+  
+.user-row {
+    background-color: #ffffff;
+}
+
+.user-row:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.send-button {
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    width: 60px;
+    height: 60px;
+    float: right;
+}
+
+.send-button:hover {
+    background-color: #ebecef;
+    cursor: pointer;
+}
+
+.send-icon {
+    width: 20px;
+    height: 20px;
+}
