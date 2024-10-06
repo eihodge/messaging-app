@@ -25,7 +25,7 @@ This was my first full-stack application that I built from the ground up. While 
 ### Why did you choose React for the frontend?
 Discuss the benefits of React, such as component-based architecture, virtual DOM for efficient UI updates, and its ecosystem with a variety of libraries.
 
-### Why did you choose Flask for the backend?
+### Why I choose Flask
 I chose Flask due to its simplicity to learn and get set up. It is a micro web framework that is good to learn for newer developers such as myself, as I implemented this while still an undergraduate student. It also is good for small projects such as this one.
 
 ### Why did you choose Flask_SQLAlchemy over a different ORM (Object-Relational Mapper) or directly using SQL queries?
