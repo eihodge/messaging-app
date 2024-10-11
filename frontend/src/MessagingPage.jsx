@@ -9,6 +9,7 @@ const MessagingPage = () => {
 
   const [senderId, setSenderId] = useState(null);
   const [receiverId, setReceiverId] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState('');
   const [lastMessageSent, setLastMessageSent] = useState(null);
@@ -16,15 +17,82 @@ const MessagingPage = () => {
   // Reference to message container used to scroll to bottom on default
   const messagesEndRef = useRef(null);
 
-
   // Handle textarea content changes
   const handleTextareaChange = (event) => {
     setMessageContent(event.target.value);
   };
 
+  // Fetch user ID by username
+  const fetchUserID = async (username) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/user/${username}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.id;
+      } else {
+        console.error("Failed to fetch a username");
+      }
+    } catch (error) {
+      console.error("Failed to fetch users: ", error);
+    }
+    return null;
+  };
+
+  // Check if a conversation exists between sender and receiver, and create one if it doesn't
+  const checkOrCreateConversation = async (senderId, receiverId) => {
+    try {
+      // Fetch all conversations involving the senderId
+      const response = await fetch(`http://127.0.0.1:5000/conversations/${senderId}`);
+      if (response.ok) {
+        const data = await response.json();
+
+        // Check if any of the conversations involve both senderId and receiverId
+        const existingConversation = data.conversations.find(conversation =>
+          (conversation.user1_id === senderId && conversation.user2_id === receiverId) ||
+          (conversation.user1_id === receiverId && conversation.user2_id === senderId)
+        );
+
+        if (existingConversation) {
+          // console.log("Existing conversation found: ", existingConversation);
+          return existingConversation.id; // Return the existing conversation ID
+        }
+      } else {
+        console.error("Failed to fetch conversations for senderId.");
+      }
+
+      // If no conversation is found, create a new one
+      // console.log("Conversation not found. Creating a new one...");
+      const createResponse = await fetch('http://127.0.0.1:5000/create_conversation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user1_id: senderId,
+          user2_id: receiverId,
+        }),
+      });
+
+      if (createResponse.ok) {
+        const createData = await createResponse.json();
+        if (createData.conversation && createData.conversation.id) {
+          // console.log("New conversation created: ", createData);
+          return createData.conversation.id; // Return the new conversation ID
+        } else if (createData.message === "Conversation already exists.") {
+          return createData.conversation_id; // Return the ID from the message (if provided)
+        }
+      } else {
+        console.error("Failed to create a new conversation.");
+      }
+    } catch (error) {
+      console.error("Failed to check or create conversation: ", error);
+    }
+    return null;
+  };
+
   // Handle message sending
   const handleSendMessage = async () => {
-    if (messageContent.trim() !== '') {
+    if (messageContent.trim() !== '' && conversationId) { // The conversation exists and the message is not empty
       try {
         const response = await fetch('http://127.0.0.1:5000/send_message', {
           method: 'POST',
@@ -35,6 +103,7 @@ const MessagingPage = () => {
             sender_id: senderId,
             receiver_id: receiverId,
             content: messageContent.trim(),
+            conversation_id: conversationId,
           }),
         });
 
@@ -52,67 +121,64 @@ const MessagingPage = () => {
 
   // Fetch user IDs and messages when component mounts or when `lastMessageSent` changes
   useEffect(() => {
-    const fetchID = async (username) => {
+    const fetchInitialData = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:5000/user/${username}`);
-        if (response.ok) {
-          const data = await response.json();
-          return data.id;
-        } else {
-          console.error("Failed to fetch a username");
-        }
-      } catch (error) {
-        console.error("Failed to fetch users: ", error);
-      }
-      return null;
-    };
-
-    const fetchMessages = async () => {
-      try {
-        const fetchedSenderId = await fetchID(username);
-        const fetchedReceiverId = await fetchID(receiverUsername);
+        const fetchedSenderId = await fetchUserID(username);
+        const fetchedReceiverId = await fetchUserID(receiverUsername);
 
         setSenderId(fetchedSenderId);
         setReceiverId(fetchedReceiverId);
 
         if (fetchedSenderId && fetchedReceiverId) {
-          const response = await fetch(
-            `http://127.0.0.1:5000/get_all_messages/${fetchedSenderId}/${fetchedReceiverId}`
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setMessages(data);
+          const existingConversationId = await checkOrCreateConversation(fetchedSenderId, fetchedReceiverId);
+          setConversationId(existingConversationId);
+
+          if(existingConversationId) {
+            const response = await fetch(
+              `http://127.0.0.1:5000/messages/${existingConversationId}`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              setMessages(data.messages);
+            } else {
+              console.error("Failed to fetch messages.");
+            }
           } else {
-            console.error("Failed to fetch messages.");
+            console.error("Failed to find/create the converation.");
           }
         } else {
           console.error("Failed to fetch sender or receiver ID.");
         }
       } catch (error) {
-        console.error("Failed to fetch messages: ", error);
+        console.error("Failed to fetch initial data: ", error);
       }
-    };
-
-    // Fetch messages initially when component mounts
-    if (username && receiverUsername) {
-      fetchMessages();
+    }
+    if (username && receiverUsername) {   // Fetch messages initially when component mounts
+      fetchInitialData();
     }
   }, [lastMessageSent]); // Dependencies include `lastMessageSent` for re-fetch after sending a message
 
-  // poll for new messages every 3 seconds
+  
+  // poll for new messages
   useEffect(() => {
     const interval = setInterval(() => {
-      if (username && receiverUsername) {
-        fetch(`http://127.0.0.1:5000/get_all_messages/${senderId}/${receiverId}`)
+      if (conversationId) {
+        fetch(`http://127.0.0.1:5000/messages/${conversationId}`)
           .then((response) => response.json())
-          .then((data) => setMessages(data))
+          .then((data) => {
+            if (data && data.messages) {  // Check if data.messages exists
+              setMessages(data.messages); // Update with the new messages array
+            } else {
+              console.error("Polling: No messages field in response", data);
+            }
+          })
           .catch((error) => console.error("Error fetching messages:", error));
       }
-    }, 1000); // 3000 = 3 seconds
-
+    }, 1000); // 1 second
+  
     // Cleanup function to clear the interval when component unmounts
     return () => clearInterval(interval);
-  }, [username, receiverUsername, senderId, receiverId]);
+  }, [conversationId]);
 
   // Scroll to the bottom when the messages changes
   useEffect(() => {
@@ -125,7 +191,7 @@ const MessagingPage = () => {
     }
   };
 
-    // Handle the "Enter" key press to send message
+    // Handles the user pressing "Enter" to send a message
     const handleKeyDown = (event) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         // prevent creating a new line if the enter key is pressed without holding down shift
