@@ -1,1 +1,5 @@
+# For Mac
 .DS_Store
+
+# Ignore the database file
+backend/instance/mydatabase.db
