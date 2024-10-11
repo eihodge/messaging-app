@@ -64,58 +64,94 @@ def get_user_by_username(username):
     return jsonify(user.to_json()), 200   # Return the user as JSON
 
 
-# CONVERSATION ENDPOINTS go here
+# CONVERSATION ENDPOINTS
+
+# Create a new conversation
+@app.route("/create_conversation", methods=["POST"])
+def create_conversation():
+    user1_id = request.json.get("user1_id")
+    user2_id = request.json.get("user2_id")
+
+    if not user1_id or not user2_id:
+        return jsonify({"message": "user1_id and user2_id are required to create a conversation."}), 400
+
+    # Check if users exist
+    user1 = User.query.get(user1_id)
+    user2 = User.query.get(user2_id)
+
+    if not user1 or not user2:
+        return jsonify({"message": "One or both users do not exist."}), 404
+
+    # Check if the conversation already exists
+    conversation = Conversation.query.filter(
+        ((Conversation.user1_id == user1_id) & (Conversation.user2_id == user2_id)) |
+        ((Conversation.user1_id == user2_id) & (Conversation.user2_id == user1_id))
+    ).first()
+
+    if conversation:
+        return jsonify({"message": "Conversation already exists.", "conversation_id": conversation.id}), 200
+
+    # Create a new conversation
+    new_conversation = Conversation(user1_id=user1_id, user2_id=user2_id)
+    try:
+        db.session.add(new_conversation)
+        db.session.commit()
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+    return jsonify({"message": "New conversation created successfully", "conversation": new_conversation.to_json()}), 201
 
 
+# Get all conversations involving a specific user
+@app.route("/conversations/<int:user_id>", methods=["GET"])
+def get_conversations_by_user(user_id):
+    # Query conversations involving the user as user1 or user2
+    conversations = Conversation.query.filter(
+        (Conversation.user1_id == user_id) | (Conversation.user2_id == user_id)
+    ).all()
 
+    json_conversations = [conversation.to_json() for conversation in conversations]
+    return jsonify({"conversations": json_conversations}), 200
 
 
 # MESSAGES ENDPOINTS
 
-# Get all messages between two users
-# @app.route("/get_all_messages/<int:sender_id>/<int:receiver_id>", methods=["GET"])
-# def get_all_messages(sender_id, receiver_id):
-#     messages = Message.query.filter(
-#         ((Message.sender_id == sender_id) & (Message.receiver_id == receiver_id)) |
-#         ((Message.sender_id == receiver_id) & (Message.receiver_id == sender_id))
-#     ).order_by(Message.timestamp).all()
-    
-#     # Serialize messages to JSON format
-#     messages_json = [message.to_json() for message in messages]
-    
-#     return jsonify(messages_json), 200
+# Get all messages for a specific conversation
+@app.route("/messages/<int:conversation_id>", methods=["GET"])
+def get_messages_by_conversation(conversation_id):
+    messages = Message.query.filter_by(conversation_id=conversation_id).order_by(Message.timestamp).all()
+    messages_json = [message.to_json() for message in messages]
+    return jsonify({"messages": messages_json}), 200
 
-
-# Get all messages between two users
-
-
-# Send a message
 @app.route("/send_message", methods=["POST"])
 def send_message():
     sender_id = request.json.get("sender_id")
     receiver_id = request.json.get("receiver_id")
     content = request.json.get("content")
-    timestamp=datetime.now(timezone.utc)
+    conversation_id = request.json.get("conversation_id")
+    timestamp = datetime.now(timezone.utc)
 
-    if not sender_id or not receiver_id or not content:
-        return jsonify({"message": "Sender ID, receiver ID and message content required for request to be processed"}), 400
+    if not sender_id or not receiver_id or not content or not conversation_id:
+        return jsonify({"message": "Sender ID, receiver ID, conversation ID, and content are required to send a message."}), 400
+
+    # Check if conversation exists
+    conversation = Conversation.query.get(conversation_id)
+    if not conversation:
+        return jsonify({"message": "Conversation not found."}), 404
+
+    # Ensure that the sender and receiver are part of the conversation
+    if sender_id not in [conversation.user1_id, conversation.user2_id] or receiver_id not in [conversation.user1_id, conversation.user2_id]:
+        return jsonify({"message": "Sender and receiver must be part of the conversation."}), 400
 
     # Create a new message
-    message = Message(
-        sender_id=sender_id, 
-        receiver_id=receiver_id, 
-        content=content, 
-        timestamp=timestamp
-    )
-    db.session.add(message)
-    db.session.commit()
-    return jsonify({"message": "Message sent successfully"}), 201
+    new_message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, conversation_id=conversation_id, timestamp=timestamp)
 
+    try:
+        db.session.add(new_message)
+        db.session.commit()
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
-
-
-
-
+    return jsonify({"message": "Message sent successfully", "message_data": new_message.to_json()}), 201
 
 
 
